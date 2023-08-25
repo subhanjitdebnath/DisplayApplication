@@ -53,7 +53,7 @@ UART_HandleTypeDef huart2;
 /* USER CODE BEGIN PV */
 
 uint8_t VerInfo[]= {MAJOR_VERSION,MINOR_VERSION};
-//uint8_t CountDn=20;
+uint8_t CountDn=20;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -108,7 +108,8 @@ int main(void)
   SSD1306_GotoXY (0,20);
   printf("Version %d.%d\n",VerInfo[0],VerInfo[1]);
   SSD1306_UpdateScreen(); //display
-  HAL_Delay (1000);
+  HAL_Delay (2000);
+  NewScreen("Jumping To", "Application", "");
 
   /* USER CODE END 2 */
 
@@ -118,6 +119,18 @@ int main(void)
   {
     /* USER CODE END WHILE */
     /* USER CODE BEGIN 3 */
+	  if(CountDn>0)
+	  {
+		  SSD1306_GotoXY (0,40);
+		  	  CountDn--;
+		  	  printf("    %d      \n",CountDn);
+		  	  HAL_Delay (1000);
+		  	  SSD1306_UpdateScreen(); //display
+		  	  if(CountDn==0)
+		  	  {
+		  		NewScreen("Application", "1.1","");
+		  	  }
+	  }
   }
   /* USER CODE END 3 */
 }
@@ -282,6 +295,19 @@ int _write(int file, char *ptr, int len)
 	  }
   return len;
 }
+
+void NewScreen(char* line1,char* line2,char* line3)
+{
+	SSD1306_Clear(); // Clear Content
+	SSD1306_GotoXY (0,0);
+	SSD1306_Puts (line1, &Font_11x18, 1);
+	SSD1306_GotoXY (0,20);
+	SSD1306_Puts (line2, &Font_11x18, 1);
+	SSD1306_GotoXY (0,40);
+	SSD1306_Puts (line3, &Font_11x18, 1);
+	SSD1306_UpdateScreen(); //display
+}
+
 
 /* USER CODE END 4 */
 

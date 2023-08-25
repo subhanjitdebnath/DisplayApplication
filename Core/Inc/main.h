@@ -73,6 +73,7 @@ void Error_Handler(void);
 #define SWO_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
+void NewScreen(char *line1,char *line2,char *line3);
 
 /* USER CODE END Private defines */
 
