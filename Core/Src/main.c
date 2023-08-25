@@ -106,7 +106,7 @@ int main(void)
   SSD1306_GotoXY (0,0);
   printf ("BootLoader  \n");
   SSD1306_GotoXY (0,20);
-  printf("Version %d.%d\n\r",VerInfo[0],VerInfo[1]);
+  printf("Version %d.%d\n",VerInfo[0],VerInfo[1]);
   SSD1306_UpdateScreen(); //display
   HAL_Delay (1000);
 
