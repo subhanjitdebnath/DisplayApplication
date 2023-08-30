@@ -24,6 +24,7 @@
 #include "stdio.h"
 #include "fonts.h"
 #include "ssd1306.h"
+#include "Functions.h"
 
 
 /* USER CODE END Includes */
@@ -42,12 +43,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 #define MAJOR_VERSION	1
-#define MINOR_VERSION	2
-
-#define ARRAYFP 0x08040000
-
-typedef void (*ptr)();
-typedef ptr ptra;
+#define MINOR_VERSION	0
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -58,8 +54,9 @@ UART_HandleTypeDef huart2;
 /* USER CODE BEGIN PV */
 
 uint8_t VerInfo[]= {MAJOR_VERSION,MINOR_VERSION};
-uint8_t CountDn=20;
+uint8_t CountDn=6;
 DeviceStatus __attribute__((section(".__shareRam"))) Status1;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -107,17 +104,25 @@ int main(void)
   MX_USART2_UART_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
+  StatusInt();
   SSD1306_Init();  // initialise
   SSD1306_Clear(); // Clear Content
   SSD1306_GotoXY (0,0);
-  printf ("Application  \n");
+  printf ("BootLoader  \n");
   SSD1306_GotoXY (0,20);
   printf("Version %d.%d\n",VerInfo[0],VerInfo[1]);
   SSD1306_UpdateScreen(); //display
   HAL_Delay (2000);
-  Status1.PowerUp=11;
-  FunctionCalls(1);
-
+  SSD1306_Clear(); // Clear Content
+  SSD1306_GotoXY (0,0);
+  printf ("STATUS      \n");
+  SSD1306_GotoXY (0,20);
+  printf("Restart  %d    \n",Status1.RestartCount);
+  SSD1306_GotoXY (0,40);
+  printf("Error  %d     \n",Status1.FaultCode);
+  SSD1306_UpdateScreen(); //display
+  HAL_Delay (2000);
+  NewScreen("Jumping To", "Application", "");
 
   /* USER CODE END 2 */
 
@@ -126,12 +131,19 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  if(!HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin))
-	  {
-		  JumpToBootLoader();
-	  }
-	  HAL_Delay(100);
     /* USER CODE BEGIN 3 */
+	  if(CountDn>0)
+	  {
+		  SSD1306_GotoXY (0,40);
+		  	  CountDn--;
+		  	  printf("    %d      \n",CountDn);
+		  	  HAL_Delay (1000);
+		  	  SSD1306_UpdateScreen(); //display
+		  	  if(CountDn==0)
+		  	  {
+		  		JumpToApplication();
+		  	  }
+	  }
   }
   /* USER CODE END 3 */
 }
@@ -309,24 +321,21 @@ void NewScreen(char* line1,char* line2,char* line3)
 	SSD1306_UpdateScreen(); //display
 }
 
-void JumpToBootLoader()
+void JumpToApplication()
 {
-	Status1.RestartCount=Status1.RestartCount+1;
-	void(*ResetHandler)(void)= (void*)(*(volatile uint32_t*)(0x08000000 + 4));
+	void (*ResetHandler)(void)=(void*)(*(volatile uint32_t*)(0x08010000 + 4));
 	ResetHandler();
 }
 
-void FunctionCalls(int a)
+void StatusInt()
 {
-	uint32_t *fp;
-	void (*ptr)();
-	fp = (uint32_t*)(volatile uint32_t)ARRAYFP;
-
-	ptr = (void*)fp[a];
-	ptr();
+	if(Status1.PowerUp != 11)
+	{
+		memset(&Status1,0,sizeof(DeviceStatus));
+		Status1.PowerUp = 151;
+	}
 
 }
-
 /* USER CODE END 4 */
 
 /**

@@ -44,9 +44,10 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 /* Memories definition */
 MEMORY
 {
-  SHARED_RAM    (xrw)    : ORIGIN = 0x20000400,   LENGTH = 1K
-  RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 90K
+  SHARED_RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 1K
+  RAM    (xrw)    : ORIGIN = 0x20000400,   LENGTH = 90K
   FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 64K
+  SHARED_FLASH    (rx)    : ORIGIN = 0x8040000,   LENGTH = 4K
 }
 
 /* Sections */
@@ -99,7 +100,6 @@ SECTIONS
     __exidx_end = .;
     . = ALIGN(4);
   } >FLASH
-
   .preinit_array     :
   {
     . = ALIGN(4);
@@ -179,6 +179,13 @@ SECTIONS
   	*(.__shareRam .__shareRam*)
   } > SHARED_RAM
 
+/* Constant data into "FLASH" Rom type memory */ 
+ .shared_flash :
+  {
+    . = ALIGN(4);
+    KEEP(*(.shared_flash*))         /* .rodata sections (constants, strings, etc.) */
+    . = ALIGN(4);
+  } >SHARED_FLASH
   /* Remove information from the compiler libraries */
   /DISCARD/ :
   {

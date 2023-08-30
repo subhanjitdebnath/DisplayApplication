@@ -41,13 +41,6 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-typedef struct
-{
-	int RestartCount;
-	int FaultCode;
-	int PowerUp ;
-
-}DeviceStatus;
 
 /* USER CODE END EC */
 
@@ -81,10 +74,6 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN Private defines */
 void NewScreen(char *line1,char *line2,char *line3);
-void JumpToApplication(void);
-void JumpToBootLoader(void);
-void StatusInt(void);
-void FunctionCalls(int a);
 
 /* USER CODE END Private defines */
 
